@@ -11,36 +11,48 @@
 		"An error has pinged and has been ponged.",
 		"PING! **{author}**",
 		"Don't you mean **{p}ping**?",
-		"{bot_nick}.exe has stopped responding. Windows is checking for a solution to the problem..."
+		"{bot_nick}.exe has stopped responding. Windows is checking for a solution to the problem...",
+		"Stop the ping timer!",
+		"**{author}** used `{p}ping`!"
 	],
 	"maxplayers": [
 		"The maximum number of players ({0}) have already joined the game.",
-		"There's no room left for you to join this game. There are already {0} players in this lobby."
+		"There's no room left for you to join this game. There are already {0} players in this lobby.",
+		"Hold the phone! There's already {0} players in the lobby, which means you can't join.",
+		"This lobby has reached its capacity limit of {0} players."
 	],
 	"minplayers": [
 		"Please wait until there are at least {0} players.",
-		"You cannot start the game until there are at least {0} players."
+		"You cannot start the game until there are at least {0} players.",
+		"Aborting! There are not at least {0} players."
 	],
 	"notplayingstart": [
-		"You are not playing, so you cannot start the game! Type `!join` to join the game."
+		"You are not playing, so you cannot start the game! Type `{p}join` to join the game.",
+		"You can't start a game you are not playing! Type `{p}join` to join the game." ,
+		"You cannot start a game you are not playing! Type `{p}join to join the game."
 	],
 	"notplayingleave": [
-		"You cannot leave a game you are not playing!"
+		"You cannot leave a game you are not playing!",
+		"You can't leave a game you are not playing!"
 	],
 	"alreadyin": [
 		"You are already playing!",
-		"You are already in!"
+		"You are already in!",
+		"You can't join a game you have already joined!"
 	],
 	"leavelobby": [
 		"**{0}** left the game. There are now **{1}** players in the lobby.",
 		"**{0}** walked out of the lobby. There are now **{1}** players in the lobby.",
 		"**{0}** was shot twice by a hunter, once in the head and once in the heart. Remaining players: **{1}**",
 		"**{0}** poked a bear in the eye with a stick and has paid the price. Remaining players: **{1}**",
-		"**{0}** was hit by a humongous yellow bullet from a giant yellow tank. The **{1}** remaining players cower in fear."
+		"**{0}** was hit by a humongous yellow bullet from a giant yellow tank. The **{1}** remaining players cower in fear.",
+		"**{0}** got catapulted out of the lobby. Remaining players: **{1}**"
 	],
 	"gamestart": [
 		"**{0}** has started a game of Werewolf. Type `{p}join` to join. Type `{p}start` to start the game.",
-		"**{0}** has started a game of Werewolf. Type `{p}start` to start the game. Type `{p}join` to join."
+		"**{0}** has started a game of Werewolf. Type `{p}start` to start the game. Type `{p}join` to join.",
+		"**{0}** created a lobby of Werewolf. Type `{p]join` to join. Type `{p}start` to start the game.",
+		"**{0}** created a lobby of Werewolf. Type `{p]start` to start the game. Type `{p}join` to join."
 	],
 	"nokills": [
 		"The villagers discover the dead body of a beloved pet penguin, but lucklily no one was harmed.",
@@ -50,7 +62,8 @@
 		"Some house doors have been opened.",
 	        "A scent much like that of a wolf permeates the air.",
 	        "Half-buried wolf droppings are found.",
-	        "Traces of wolf fur are found."
+	        "Traces of wolf fur are found.",
+		"The villagers discover the dead body of a whale on the coast, but luckily no one was harmed."
 	],
 	"lynched": [
 		"The villagers have agreed to lynch **{0}**, a **{1}**.",
@@ -62,16 +75,20 @@
 		"The villagers force **{0}** to play Russian Roulette. The town square is stained with the remains of the **{1}**.",
 		"The villagers, after much debate, finally decide on lynching **{0}**, who turned out to be... a **{1}**.",
 		"After a prolonged struggle, **{0}** is forced to the gallows, and is discovered after death to be a **{1}**.",
-		"The villagers choose to hang **{0}**; however, the rope stretches and breaks, and the ensuing fall kills the **{1}**."
+		"The villagers choose to hang **{0}**; however, the rope stretches and breaks, and the ensuing fall kills the **{1}**.",
+		"The villagers knock **{0}** into a permanent coma, later discovering that they are a **{1}**."
 	],
 	"hastotem": [
-		"**{0}** is in possession of a mysterious totem..."
+		"**{0}** is in possession of a mysterious totem...",
+		"**{0}** seems to have a mysterious totem...",
 	],
 	"hastotem2": [
-		"**{0}** and **{1}** are in possession of a mysterious totem..."
+		"**{0}** and **{1}** are in possession of a mysterious totem...",
+		"**{0}** and **{1}** seem to have a mysterious totem..."
 	],
 	"hastotems": [
-		"**{0}**, and **{1}** are in possession of a mysterious totem..."
+		"**{0}**, and **{1}** are in possession of a mysterious totem...",
+		"**{0}**, and **{1}** seem to have a mysterious totem..."
 	],
 	"leavedeath": [
 		"**{0}** spontaneously combusted. The air smells of freshly burnt **{1}**.",
@@ -84,9 +101,13 @@
 		"Standing under a tree, **{0}**, a **{1}**, is killed by a falling branch.",
 		"**{0}**, a **{1}**, is killed by lightning before the villagers' eyes. The air smells of burnt flesh.",
         	"Rampaging through the village, a bull gores **{0}**, a **{1}**.",
-	        "**{0}**, a **{1}**, falls into a vat of molasses and drowns."
+	        "**{0}**, a **{1}**, falls into a vat of molasses and drowns.",
+		"**{0}**, a **{1}**, went off to a different village, but got killed on the way."
 	],
 	"firstjoin": [
-		"**{0}** has started a game of Werewolf. Type `{p}join` to join. Type `{p}start` to start the game."
+		"**{0}** has started a game of Werewolf. Type `{p}join` to join. Type `{p}start` to start the game.",
+		"**{0}** has started a game of Werewolf. Type `{p}start` to start the game. Type `{p}join` to join.",
+		"**{0}** created a lobby of Werewolf. Type `{p]join` to join. Type `{p}start` to start the game.",
+		"**{0}** created a lobby of Werewolf. Type `{p]start` to start the game. Type `{p}join` to join."
 	]
 }
