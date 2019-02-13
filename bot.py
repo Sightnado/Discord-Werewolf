@@ -25,6 +25,7 @@ ratelimit_dict = {}
 pingif_dict = {}
 notify_me = []
 stasis = {}
+nextstasis = {}
 commands = {}
 
 wait_bucket = WAIT_BUCKET_INIT
@@ -42,6 +43,12 @@ if os.path.isfile(STASIS_FILE):
 else:
     with open(STASIS_FILE, 'a+') as stasis_file:
         stasis_file.write('{}')
+if os.path.isfile(OFFENDER_FILE):
+    with open(OFFENDER_FILE, 'r') as offender_file:
+        nextstasis = json.load(offender_file)
+else:
+    with open(OFFENDER_FILE, 'a+') as offender_file:
+        offender_file.write('{}')
 
 random.seed(datetime.now())
 
@@ -319,9 +326,19 @@ async def cmd_leave(message, parameters):
             message.author.name, get_role(message.author.id, 'death')))
         await player_deaths({message.author.id : ('leave', "bot")})
         if message.author.id in stasis:
-            stasis[message.author.id] += QUIT_GAME_STASIS
+            if message.author.id in nextstasis:
+                stasis[message.author.id] += nextstasis[message.author.id] * QUIT_GAME_STASIS
+                nextstasis[message.author.id] = nextstasis[message.author.id] * QUIT_GAME_STASIS * 4
+            else:
+                stasis[message.author.id] += QUIT_GAME_STASIS
+                nextstasis[message.author.id] = QUIT_GAME_STASIS * 4
         else:
-            stasis[message.author.id] = QUIT_GAME_STASIS
+            if message.author.id in nextstasis:
+                stasis[message.author.id] = nextstasis[message.author.id] * QUIT_GAME_STASIS
+                nextstasis[message.author.id] = nextstasis[message.author.id] * QUIT_GAME_STASIS * 4
+            else:
+                stasis[message.author.id] = QUIT_GAME_STASIS
+                nextstasis[message.author.id] = nextstasis[message.author.id] * QUIT_GAME_STASIS * 4
         if session[0] and win_condition() == None:
             await check_traitor()
         await log(1, "{} ({}) QUIT DURING GAME".format(message.author.display_name, message.author.id))
@@ -2248,16 +2265,21 @@ async def cmd_fstasis(message, parameters):
             if amount >= 0:
                 if player not in stasis:
                     stasis[player] = 0
+                if player not in nextstasis:
+                    nextstasis[player] = 1
                 reply_msg = "Successfully "
                 if action in ['+', 'add', 'give']:
                     stasis[player] += amount
+                    nextstasis[player] += amount * 4
                     reply_msg += "increased **{0}** ({1})'s stasis by **{2}**."
                 elif action in ['-', 'remove', 'del']:
                     amount = min(amount, stasis[player])
                     stasis[player] -= amount
+                    nextstasis[player] = stasis[player] * 4
                     reply_msg += "decreased **{0}** ({1})'s stasis by **{2}**."
                 elif action in ['=', 'set']:
                     stasis[player] = amount
+                    nextstasis[player] = amount * 4
                     reply_msg += "set **{0}** ({1})'s stasis to **{2}**."
                 else:
                     if player not in stasis:
@@ -3662,6 +3684,8 @@ async def run_game():
 
     for stasised in [x for x in stasis if stasis[x] > 0]:
         stasis[stasised] -= 1
+    for offenders in [x for x in nextstasis if nextstasis[x] > 1]:
+        nextstasis[offenders] -= 1
     await send_lobby("<@{}>, Welcome to Werewolf, the popular detective/social party game (a theme of Mafia). "
                               "Using the **{}** game mode with **{}** players.\nAll players check for PMs from me for instructions. "
                               "If you did not receive a pm, please let {} know.".format('> <@'.join(sort_players(session[1])),
@@ -4661,6 +4685,8 @@ async def backup_settings_loop():
             notify_file.write(','.join([x for x in notify_me if x != '']))
         with open(STASIS_FILE, 'w') as stasis_file:
             json.dump(stasis, stasis_file)
+        with open(OFFENDER_FILE, 'w') as offender_file:
+            json.dump{nextstasis, offender_file)
         await asyncio.sleep(BACKUP_INTERVAL)
 
 ############## POST-DECLARATION STUFF ###############
@@ -4949,17 +4975,18 @@ gamemodes = {
         'min_players' : 4,
         'max_players' : 24,
         'roles' : {
-            #4, 5, 6, 7, 8, 9, 10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
+            #4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16
             'wolf' :
-            [1, 1, 1, 1, 1, 1,  1, 1, 2, 2, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3],
+            [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 2],
             'traitor' :
-            [0, 0, 0, 0, 1, 1,  1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+            [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2],
             'crazed shaman' :
-            [3, 4, 5, 6, 5, 6,  7, 7, 7, 8, 8, 9, 9,10,11,12,11,12,13,14,15],
+            [3, 4, 5, 6, 5, 6, 7, 7, 7, 8, 8, 9, 9],
             'fool' :
-            [0, 0, 0, 0, 1, 1,  1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4],
+            [0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3],
             'cursed villager' :
-            [0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        }
     },
     'belunga' : {
         'description' : "Originally an april fool's joke, this gamemode is interesting, to say the least.",
@@ -4988,34 +5015,34 @@ gamemodes = {
     'evilvillage' : {
         'description' : 'Majority of the village is wolf aligned, safes must secretly try to kill the wolves.',
         'min_players' : 6,
-        'max_players' : 20,
+        'max_players' : 18,
         'roles' : {
-            #4, 5, 6, 7, 8, 9, 10,11,12,13,14,15,16,17,18,19,20
+            #4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18
             'wolf' :
-            [0, 0, 1, 1, 1, 1,  1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3],
+            [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2],
             'cultist' :
-            [0, 0, 4, 5, 5, 6,  4, 5, 5, 6, 7, 6, 6, 6, 6, 7, 6],
+            [0, 0, 4, 5, 5, 6, 4, 5, 5, 6, 7, 6, 7, 8, 9],
             'seer' :
-            [0, 0, 0, 0, 1, 1,  1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2],
+            [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             'shaman' :
-            [0, 0, 0, 0, 0, 0,  0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2],
+            [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
             'hunter' :
-            [0, 0, 1, 1, 1, 1,  1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3],
+            [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2],
             'guardian angel' :
-            [0, 0, 0, 0, 0, 0,  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             'fool' :
-            [0, 0, 0, 0, 0, 0,  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             'minion' :
-            [0, 0, 0, 0, 0, 0,  1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2],
+            [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             'mayor' :
-            [0, 0, 0, 0, 0, 0,  0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1]}
+            [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]}
     },
     'drunkfire' : {
         'description' : "Most players get a gun, quickly shoot all the wolves!",
         'min_players' : 8,
         'max_players' : 17,
         'roles' : {
-            #4, 5, 6, 7, 8, 9, 10,11,12,13,14,15
+            #4, 5, 6, 7, 8, 9, 10,11,12,13,14,15,16,17
             'wolf' :
             [0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3],
             'traitor' :
@@ -5121,45 +5148,6 @@ gamemodes = {
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             'villager' :
             [0, 0, 3, 4, 3, 4, 3, 3, 2, 3, 3, 4, 4, 5, 5, 5, 6, 7, 6, 7, 8]
-         }
-    },
-    'truesight' : {
-        'description' : "The oracle sees all.",
-        'min_players' : 4,
-        'max_players' : 24,
-         'roles' : {
-            'oracle' :
-            [1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4],
-            'harlot' :
-            [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-            'shaman' :
-            [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2],
-            'detective' :
-            [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            'bodyguard' :
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2],
-            'wolf' :
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3],
-            'traitor' :
-            [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            'werekitten' :
-            [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            'warlock' :
-            [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            'sorcerer' :
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1],
-            'vengeful ghost' :
-            [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            'cursed villager' :
-            [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            'gunner' :
-            [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            'mayor' :
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            'sharpshooter' :
-            [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            'villager' :
-            [2, 3, 4, 5, 3, 4, 3, 3, 2, 3, 3, 4, 3, 4, 3, 3, 4, 5, 4, 5, 5]
          }
     }
 #    'template' : {
